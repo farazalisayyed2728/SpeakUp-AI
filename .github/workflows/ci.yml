@@ -1,0 +1,31 @@
+name: CI
+on: [push, pull_request]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env: {POSTGRES_USER: speakup, POSTGRES_PASSWORD: speakup, POSTGRES_DB: speakup}
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U speakup" --health-interval 5s --health-retries 10
+      redis:
+        image: redis:7-alpine
+        ports: ["6379:6379"]
+    env:
+      DATABASE_URL: postgresql://speakup:speakup@localhost:5432/speakup
+      REDIS_URL: redis://localhost:6379/0
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12", cache: pip}
+      - uses: actions/setup-node@v4
+        with: {node-version: "22", cache: npm}
+      - run: pip install -r requirements-dev.txt
+      - run: npm ci && npm run build
+      - run: ruff check . && ruff format --check .
+      - run: python manage.py makemigrations --check --dry-run
+        env: {DJANGO_SETTINGS_MODULE: config.settings.test}
+      - run: python -m pytest --cov=apps
+      - run: docker build -t speakup-ai .

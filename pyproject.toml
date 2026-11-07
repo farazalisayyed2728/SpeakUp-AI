@@ -1,0 +1,19 @@
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+extend-exclude = ["migrations", "static"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "S", "DJ"]
+ignore = ["S101"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["S105", "S106", "S603", "S607", "E501"]
+"config/settings/*" = ["S105", "F403", "F405"]
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "config.settings.test"
+python_files = ["test_*.py"]
+addopts = "-ra --strict-markers"
+testpaths = ["tests"]
+norecursedirs = ["tests/browser", "tests/performance"]

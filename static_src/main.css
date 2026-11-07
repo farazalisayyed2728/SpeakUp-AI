@@ -1,0 +1,48 @@
+@import "tailwindcss";
+@source "../templates";
+
+@theme {
+  --color-night: #150f38;
+  --color-night-2: #1f1752;
+  --color-violet: #7b5cff;
+  --color-signal: #3ee0c5;
+  --color-saffron: #ffc857;
+  --color-mist: #f2f0ff;
+  --color-ink: #1d1840;
+  --color-ink-soft: #5b5683;
+  --font-display: "Bricolage Grotesque", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
+}
+
+@layer base {
+  html { scroll-behavior: smooth; }
+  body { font-family: var(--font-sans); color: var(--color-ink); background: var(--color-mist); }
+  :focus-visible { outline: 3px solid var(--color-saffron); outline-offset: 3px; border-radius: 6px; }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after { animation-duration: .001ms !important; transition-duration: .001ms !important; }
+  }
+}
+
+.stage {
+  background:
+    radial-gradient(60rem 40rem at 78% 40%, rgb(123 92 255 / .35), transparent 60%),
+    radial-gradient(40rem 30rem at 10% 100%, rgb(62 224 197 / .12), transparent 60%),
+    var(--color-night);
+}
+
+/* Tilt tiles: the transform is driven from JS (see tilt.js); here only the depth cues. */
+.tilt { transform-style: preserve-3d; transition: transform .25s ease-out, box-shadow .25s; will-change: transform; }
+.tilt > .tilt-lift { transform: translateZ(36px); }
+.tilt-glare {
+  position: absolute; inset: 0; border-radius: inherit; pointer-events: none; opacity: 0;
+  background: radial-gradient(18rem circle at var(--gx, 50%) var(--gy, 0%), rgb(255 255 255 / .35), transparent 55%);
+  transition: opacity .25s;
+}
+.tilt:hover .tilt-glare { opacity: 1; }
+
+.mic-ring { box-shadow: 0 0 0 0 rgb(62 224 197 / .55); }
+.mic-ring[aria-pressed="true"] { animation: pulse 1.6s ease-out infinite; }
+@keyframes pulse { to { box-shadow: 0 0 0 16px rgb(62 224 197 / 0); } }
+
+.strip { scrollbar-width: thin; scrollbar-color: var(--color-violet) transparent; }

@@ -1,0 +1,19 @@
+{% load static %}<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}SpeakUp AI — practise speaking out loud{% endblock %}</title>
+  <meta name="description" content="{% block description %}Practise interviews, introductions and everyday conversations with a coach that gives you something specific to fix next.{% endblock %}">
+  <meta name="theme-color" content="#150f38">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=DM+Sans:ital,opsz,wght@0,9..40,400..700;1,9..40,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'dist/app.css' %}?v={{ ASSET_VERSION }}">
+  <script type="module" src="{% static 'dist/app.js' %}?v={{ ASSET_VERSION }}"></script>
+</head>
+<body class="antialiased">
+  <a href="#main" class="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 focus:bg-saffron focus:text-night focus:px-4 focus:py-2 focus:rounded-lg">Skip to content</a>
+  {% block body %}{% endblock %}
+</body>
+</html>

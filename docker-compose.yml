@@ -1,0 +1,46 @@
+x-app: &app
+  build: .
+  env_file: [.env]
+  environment:
+    DJANGO_SETTINGS_MODULE: config.settings.development
+  volumes: [".:/app"]
+  depends_on:
+    db: {condition: service_healthy}
+    redis: {condition: service_healthy}
+
+services:
+  db:
+    image: postgres:16-alpine
+    environment: {POSTGRES_USER: speakup, POSTGRES_PASSWORD: speakup, POSTGRES_DB: speakup}
+    volumes: ["pgdata:/var/lib/postgresql/data"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U speakup"]
+      interval: 5s
+      retries: 10
+  redis:
+    image: redis:7-alpine
+    healthcheck: {test: ["CMD", "redis-cli", "ping"], interval: 5s, retries: 10}
+  migrate:            # one controlled migration step — never run from every web worker
+    <<: *app
+    command: python manage.py migrate --noinput
+    restart: "no"
+  web:
+    <<: *app
+    command: python manage.py runserver 0.0.0.0:8000
+    ports: ["8000:8000"]
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+      db: {condition: service_healthy}
+      redis: {condition: service_healthy}
+  worker:
+    <<: *app
+    command: celery -A config worker -l info -Q default
+  beat:
+    <<: *app
+    command: celery -A config beat -l info
+    profiles: ["scheduled"]
+  mailpit:
+    image: axllent/mailpit
+    ports: ["8025:8025"]
+volumes:
+  pgdata:
