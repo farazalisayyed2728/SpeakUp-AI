@@ -24,6 +24,7 @@ class UserManager(BaseUserManager):
     def create_superuser(self, email, password=None, **extra):
         extra.setdefault("is_staff", True)
         extra.setdefault("is_superuser", True)
+        extra.setdefault("email_verified_at", timezone.now()) 
         if not (extra["is_staff"] and extra["is_superuser"]):
             raise ValueError("Superuser must have is_staff=True and is_superuser=True.")
         return self._create(email, password, **extra)
@@ -57,3 +58,39 @@ class User(AbstractBaseUser, PermissionsMixin):
     @property
     def is_email_verified(self) -> bool:
         return self.email_verified_at is not None
+
+class AuditEvent(models.Model):
+    """Append-only security trail. Never store passwords, tokens or raw emails in metadata."""
+
+    class Type(models.TextChoices):
+        REGISTERED = "registered"
+        REGISTER_DUPLICATE = "register_duplicate"
+        EMAIL_VERIFIED = "email_verified"
+        VERIFICATION_RESENT = "verification_resent"
+        LOGIN_SUCCESS = "login_success"
+        LOGIN_FAILED = "login_failed"
+        LOGIN_BLOCKED_UNVERIFIED = "login_blocked_unverified"
+        LOGOUT = "logout"
+        PASSWORD_RESET_REQUESTED = "password_reset_requested"
+        PASSWORD_RESET_COMPLETED = "password_reset_completed"
+        PASSWORD_CHANGED = "password_changed"
+        RATE_LIMITED = "rate_limited"
+
+    user = models.ForeignKey(
+        "accounts.User", null=True, blank=True, on_delete=models.SET_NULL, related_name="+"
+    )
+    event_type = models.CharField(max_length=40, choices=Type.choices)
+    ip_address = models.GenericIPAddressField(null=True, blank=True)
+    user_agent = models.CharField(max_length=200, blank=True)
+    metadata = models.JSONField(default=dict, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+        indexes = [
+            models.Index(fields=["user", "-created_at"], name="audit_user_created_idx"),
+            models.Index(fields=["event_type", "-created_at"], name="audit_type_created_idx"),
+        ]
+
+    def __str__(self) -> str:
+        return f"{self.event_type} @ {self.created_at:%Y-%m-%d %H:%M}"
