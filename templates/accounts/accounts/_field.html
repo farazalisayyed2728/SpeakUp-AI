@@ -1,0 +1,13 @@
+<div x-data="{ show: false }">
+  <label for="{{ field.id_for_label }}" class="mb-1.5 block text-sm font-semibold">{{ field.label }}</label>
+  <div class="relative">
+    {{ field }}
+    {% if field.field.widget.input_type == "password" %}
+    <button type="button" class="absolute right-3 top-1/2 -translate-y-1/2 rounded px-1 text-sm font-semibold text-violet"
+            @click="show = !show" :aria-pressed="show.toString()"
+            :aria-label="show ? 'Hide password' : 'Show password'" x-text="show ? 'Hide' : 'Show'">Show</button>
+    {% endif %}
+  </div>
+  {% if field.help_text %}<p class="mt-1.5 text-sm text-ink-soft">{{ field.help_text }}</p>{% endif %}
+  {% for error in field.errors %}<p class="mt-1.5 text-sm font-medium text-red-700">{{ error }}</p>{% endfor %}
+</div>
