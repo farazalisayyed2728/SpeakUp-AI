@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block title %}{{ heading }} — SpeakUp AI{% endblock %}
+{% block body %}
+<div class="stage min-h-screen text-white lg:grid lg:grid-cols-[1fr_1.1fr]" x-data="orbBackdrop">
+  <aside class="flex flex-col px-6 pt-6 sm:px-10 lg:min-h-screen lg:py-8">
+    <a href="{% url 'core:landing' %}" class="font-display text-xl font-bold">SpeakUp<span class="text-signal"> AI</span></a>
+    <div class="relative my-2 h-36 sm:h-48 lg:my-auto lg:h-[26rem]">
+      <canvas x-ref="canvas" class="absolute inset-0 h-full w-full" aria-hidden="true"></canvas>
+    </div>
+    <p class="hidden max-w-sm pb-8 text-lg text-white/70 lg:block">Say it out loud, fix one thing, go again.</p>
+  </aside>
+
+  <main id="main" class="flex items-start justify-center px-4 pb-16 sm:px-10 lg:items-center lg:px-16">
+    <div class="w-full max-w-md rounded-3xl bg-white p-7 text-ink shadow-2xl sm:p-9">
+      <h1 class="font-display text-3xl font-bold tracking-tight">{{ heading }}</h1>
+      {% if intro %}<p class="mt-2 text-ink-soft">{{ intro }}</p>{% endif %}
+
+      {% if form %}
+        {% if form.errors %}
+        <div role="alert" tabindex="-1" x-init="$el.focus()" class="mt-5 rounded-xl border border-red-300 bg-red-50 p-4 text-sm text-red-900">
+          <p class="font-semibold">Please fix the following:</p>
+          <ul class="mt-2 list-disc space-y-1 pl-5">
+            {% for field in form.visible_fields %}{% for e in field.errors %}<li><a class="underline" href="#{{ field.id_for_label }}">{{ field.label }}: {{ e }}</a></li>{% endfor %}{% endfor %}
+            {% for e in form.non_field_errors %}<li>{{ e }}</li>{% endfor %}
+          </ul>
+        </div>
+        {% endif %}
+
+        <form method="post" novalidate class="mt-6 space-y-5" x-data="{ busy: false }" @submit="busy = true" @input="pulse()">
+          {% csrf_token %}
+          {% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
+          {% for field in form.visible_fields %}{% include "accounts/_field.html" %}{% endfor %}
+          {% for hidden in form.hidden_fields %}{{ hidden }}{% endfor %}
+          {% if "timezone" in form.fields %}<span x-init="document.getElementById('id_timezone').value = Intl.DateTimeFormat().resolvedOptions().timeZone"></span>{% endif %}
+          {% if hints %}
+          <ul class="space-y-1 rounded-xl bg-mist p-4 text-sm text-ink-soft">
+            <li>At least 10 characters</li>
+            <li>Not a commonly used password</li>
+            <li>Not only numbers</li>
+            <li>Different from your email and name</li>
+          </ul>
+          {% endif %}
+          <button type="submit" :disabled="busy" class="w-full rounded-full bg-violet px-6 py-3.5 font-semibold text-white transition hover:brightness-110 disabled:cursor-wait disabled:opacity-60">
+            <span x-text="busy ? 'Working…' : '{{ submit|escapejs }}'">{{ submit }}</span>
+          </button>
+        </form>
+      {% else %}
+        <p class="mt-4 leading-relaxed text-ink-soft" role="status">{{ message }}</p>
+      {% endif %}
+
+      {% if actions %}
+      <div class="mt-7 flex flex-wrap gap-3">
+        {% for a in actions %}
+        <a href="{{ a.1 }}" class="rounded-full px-5 py-3 font-semibold {% if a.2 %}bg-violet text-white hover:brightness-110{% else %}border border-ink/25 text-ink hover:border-violet{% endif %}">{{ a.0 }}</a>
+        {% endfor %}
+      </div>
+      {% endif %}
+
+      {% if links %}
+      <ul class="mt-6 space-y-2 text-sm">
+        {% for l in links %}<li><a class="font-medium text-violet underline-offset-2 hover:underline" href="{{ l.1 }}">{{ l.0 }}</a></li>{% endfor %}
+      </ul>
+      {% endif %}
+    </div>
+  </main>
+</div>
+{% endblock %}
