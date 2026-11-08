@@ -1,3 +1,6 @@
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render
+from django.views.decorators.cache import never_cache
 from django.views.generic import TemplateView
 
 PRACTICE_MODES = [
@@ -53,3 +56,9 @@ class LandingView(TemplateView):
         ctx = super().get_context_data(**kwargs)
         ctx["modes"] = PRACTICE_MODES
         return ctx
+
+@never_cache
+@login_required
+def dashboard(request):
+    """Placeholder landing spot after login. The real dashboard arrives in Phase 3."""
+    return render(request, "core/dashboard.html")
