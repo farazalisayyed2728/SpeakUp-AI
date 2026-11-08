@@ -171,3 +171,25 @@ LOGGING = {
 
 SENTRY_DSN = env("SENTRY_DSN", "")
 FEATURE_AI_ENABLED = env_bool("FEATURE_AI_ENABLED", False)  # stays off until Phase 8
+
+
+# --- Phase 2: accounts, email, rate limiting -----------------------------------------
+LOGIN_URL = "accounts:login"
+LOGIN_REDIRECT_URL = "core:dashboard"
+LOGOUT_REDIRECT_URL = "core:landing"
+SESSION_COOKIE_AGE = 60 * 60 * 24 * 14
+PASSWORD_RESET_TIMEOUT = 60 * 60  # reset links live 1 hour
+EMAIL_VERIFICATION_MAX_AGE = 60 * 60 * 24  # verification links live 24 hours
+SITE_URL = env("SITE_URL", "http://localhost:8000")
+DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL", "SpeakUp AI <no-reply@speakup.local>")
+EMAIL_BACKEND = env("EMAIL_BACKEND", "django.core.mail.backends.smtp.EmailBackend")
+EMAIL_HOST = env("EMAIL_HOST", "localhost")
+EMAIL_PORT = int(env("EMAIL_PORT", "25"))
+EMAIL_HOST_USER = env("EMAIL_HOST_USER", "")
+EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD", "")
+EMAIL_USE_TLS = env_bool("EMAIL_USE_TLS", False)
+EMAIL_TIMEOUT = 10
+
+RATELIMIT_BACKEND = env("RATELIMIT_BACKEND", "redis")  # "redis" | "memory"
+# How many reverse proxies sit in front of Django. 0 = never trust X-Forwarded-For.
+TRUSTED_PROXY_COUNT = int(env("TRUSTED_PROXY_COUNT", "0"))
