@@ -45,7 +45,9 @@ def test_tampered_link(client, make_user):
 
 def test_unverified_user_cannot_log_in_but_can_resend(client, make_user):
     make_user(verified=False)
-    r = client.post(reverse("accounts:login"), {"email": "ada@example.com", "password": "correct-horse-battery"})
+    r = client.post(
+        reverse("accounts:login"), {"email": "ada@example.com", "password": "correct-horse-battery"}
+    )
     assert r.status_code == 200 and b"confirm your email" in r.content
     assert "_auth_user_id" not in client.session
     client.post(reverse("accounts:resend-verification"), {"email": "ada@example.com"})

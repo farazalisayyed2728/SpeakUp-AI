@@ -103,10 +103,26 @@ def verify_email_view(request, token: str):
     login_action = ("Log in", reverse("accounts:login"), True)
     resend_action = ("Send a new link", reverse("accounts:resend-verification"), True)
     copy = {
-        VerifyResult.VERIFIED: ("Email confirmed", "You're all set. Log in to start practising.", login_action),
-        VerifyResult.ALREADY_VERIFIED: ("Already confirmed", "This email is already confirmed, so you can log in.", login_action),
-        VerifyResult.EXPIRED: ("This link has expired", "Confirmation links last 24 hours. We can send you a fresh one.", resend_action),
-        VerifyResult.INVALID: ("This link isn't valid", "It may have been copied incorrectly. We can send you a new one.", resend_action),
+        VerifyResult.VERIFIED: (
+            "Email confirmed",
+            "You're all set. Log in to start practising.",
+            login_action,
+        ),
+        VerifyResult.ALREADY_VERIFIED: (
+            "Already confirmed",
+            "This email is already confirmed, so you can log in.",
+            login_action,
+        ),
+        VerifyResult.EXPIRED: (
+            "This link has expired",
+            "Confirmation links last 24 hours. We can send you a fresh one.",
+            resend_action,
+        ),
+        VerifyResult.INVALID: (
+            "This link isn't valid",
+            "It may have been copied incorrectly. We can send you a new one.",
+            resend_action,
+        ),
     }[result]
     status = 200 if result in (VerifyResult.VERIFIED, VerifyResult.ALREADY_VERIFIED) else 400
     return _page(request, status=status, heading=copy[0], message=copy[1], actions=[copy[2]])
@@ -144,7 +160,9 @@ def login_view(request):
     form = LoginForm(request.POST or None)
     if request.method == "POST" and form.is_valid():
         email, password = form.cleaned_data["email"], form.cleaned_data["password"]
-        wait = check_all([(ratelimits.LOGIN_IP, client_ip(request)), (ratelimits.LOGIN_EMAIL, email)])
+        wait = check_all(
+            [(ratelimits.LOGIN_IP, client_ip(request)), (ratelimits.LOGIN_EMAIL, email)]
+        )
         if wait:
             return _limited(request, wait)
         user = authenticate(request, username=email, password=password)
@@ -153,7 +171,10 @@ def login_view(request):
             form.add_error(None, "Email or password is incorrect.")
         elif not user.is_email_verified:
             audit.record(AuditEvent.Type.LOGIN_BLOCKED_UNVERIFIED, request, user)
-            form.add_error(None, "Please confirm your email first. Use “Resend confirmation” below if you need a new link.")
+            form.add_error(
+                None,
+                "Please confirm your email first. Use “Resend confirmation” below if you need a new link.",
+            )
         else:
             login(request, user)  # rotates the session key
             audit.record(AuditEvent.Type.LOGIN_SUCCESS, request, user)
@@ -186,7 +207,9 @@ def password_forgot_view(request):
     form = EmailForm(request.POST or None)
     if request.method == "POST" and form.is_valid():
         email = form.cleaned_data["email"]
-        wait = check_all([(ratelimits.RESET_IP, client_ip(request)), (ratelimits.RESET_EMAIL, email)])
+        wait = check_all(
+            [(ratelimits.RESET_IP, client_ip(request)), (ratelimits.RESET_EMAIL, email)]
+        )
         if wait:
             return _limited(request, wait)
         services.request_password_reset(email, request)

@@ -35,7 +35,9 @@ def test_full_reset_flow_and_link_is_single_use(client, make_user, link_in_last_
     r = client.get(link, follow=True)  # Django swaps the token into the session
     assert r.status_code == 200 and b"Choose a new password" in r.content
     set_url = r.redirect_chain[-1][0]
-    r = client.post(set_url, {"new_password1": "fresh-garden-lamp-3", "new_password2": "fresh-garden-lamp-3"})
+    r = client.post(
+        set_url, {"new_password1": "fresh-garden-lamp-3", "new_password2": "fresh-garden-lamp-3"}
+    )
     assert r.status_code == 302 and r.url == reverse("accounts:password-reset-complete")
     u.refresh_from_db()
     assert u.check_password("fresh-garden-lamp-3") and u.is_email_verified
@@ -49,7 +51,9 @@ def test_expired_reset_link_rejected(client, make_user, monkeypatch):
     token = default_token_generator.make_token(u)
     real_now = PasswordResetTokenGenerator._now
     monkeypatch.setattr(
-        PasswordResetTokenGenerator, "_now", lambda self: real_now(self).replace(year=real_now(self).year + 1)
+        PasswordResetTokenGenerator,
+        "_now",
+        lambda self: real_now(self).replace(year=real_now(self).year + 1),
     )
     assert b"be used" in client.get(reset_url(u, token), follow=True).content
 
@@ -57,17 +61,25 @@ def test_expired_reset_link_rejected(client, make_user, monkeypatch):
 def test_password_reset_signs_out_other_devices(client, make_user, link_in_last_email):
     make_user()
     other = Client()
-    other.post(reverse("accounts:login"), {"email": "ada@example.com", "password": "correct-horse-battery"})
+    other.post(
+        reverse("accounts:login"), {"email": "ada@example.com", "password": "correct-horse-battery"}
+    )
     assert other.get(reverse("core:dashboard")).status_code == 200
     forgot(client, "ada@example.com")
     r = client.get(link_in_last_email().replace("http://testserver", ""), follow=True)
-    client.post(r.redirect_chain[-1][0], {"new_password1": "fresh-garden-lamp-3", "new_password2": "fresh-garden-lamp-3"})
+    client.post(
+        r.redirect_chain[-1][0],
+        {"new_password1": "fresh-garden-lamp-3", "new_password2": "fresh-garden-lamp-3"},
+    )
     assert other.get(reverse("core:dashboard")).status_code == 302
 
 
 def test_verification_token_cannot_reset_a_password(client, make_user):
     u = make_user()
-    assert b"be used" in client.get(reset_url(u, tokens.make_verification_token(u)), follow=True).content
+    assert (
+        b"be used"
+        in client.get(reset_url(u, tokens.make_verification_token(u)), follow=True).content
+    )
 
 
 def test_password_change_requires_login(client):

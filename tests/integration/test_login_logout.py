@@ -24,7 +24,10 @@ def test_wrong_password_and_unknown_email_look_identical(client, make_user):
     a = login(client, password="wrong-wrong-wrong")
     b = login(client, email="ghost@example.com")
     assert a.status_code == b.status_code == 200
-    assert b"Email or password is incorrect." in a.content and b"Email or password is incorrect." in b.content
+    assert (
+        b"Email or password is incorrect." in a.content
+        and b"Email or password is incorrect." in b.content
+    )
     assert AuditEvent.objects.filter(event_type="login_failed").count() == 2
 
 
@@ -39,7 +42,9 @@ def test_safe_next_is_followed(client, make_user):
     assert r.url == "/dashboard/"
 
 
-@pytest.mark.parametrize("evil", ["https://evil.example/steal", "//evil.example", "javascript:alert(1)"])
+@pytest.mark.parametrize(
+    "evil", ["https://evil.example/steal", "//evil.example", "javascript:alert(1)"]
+)
 def test_open_redirect_is_blocked(client, make_user, evil):
     make_user()
     assert login(client, next=evil).url == reverse("core:dashboard")

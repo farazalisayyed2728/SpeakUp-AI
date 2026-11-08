@@ -1,8 +1,7 @@
 from django.contrib import admin
-from .models import AuditEvent, User
 from django.contrib.auth.admin import UserAdmin as DjangoUserAdmin
 
-from .models import User
+from .models import AuditEvent, User
 
 
 @admin.register(User)

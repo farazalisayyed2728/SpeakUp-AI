@@ -57,6 +57,7 @@ class LandingView(TemplateView):
         ctx["modes"] = PRACTICE_MODES
         return ctx
 
+
 @never_cache
 @login_required
 def dashboard(request):

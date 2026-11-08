@@ -44,7 +44,9 @@ def register(*, email: str, full_name: str, password: str, tz: str, request) -> 
         return
 
     existing = User.objects.filter(email=email).first()
-    audit.record(AuditEvent.Type.REGISTER_DUPLICATE, request, existing, email=audit.fingerprint(email))
+    audit.record(
+        AuditEvent.Type.REGISTER_DUPLICATE, request, existing, email=audit.fingerprint(email)
+    )
     if existing is not None:
         enqueue(tasks.send_already_registered_email, existing.pk)
 
@@ -85,4 +87,3 @@ def request_password_reset(email: str, request) -> None:
     )
     if user is not None:
         enqueue(tasks.send_password_reset_email, user.pk)
-        

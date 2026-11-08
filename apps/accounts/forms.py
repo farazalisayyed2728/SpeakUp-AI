@@ -33,7 +33,9 @@ class RegistrationForm(Styled, forms.Form):
         label="Email", max_length=254, widget=forms.EmailInput(attrs={"autocomplete": "email"})
     )
     password1 = forms.CharField(
-        label="Password", strip=False, widget=forms.PasswordInput(attrs={"autocomplete": "new-password"})
+        label="Password",
+        strip=False,
+        widget=forms.PasswordInput(attrs={"autocomplete": "new-password"}),
     )
     password2 = forms.CharField(
         label="Confirm password",
@@ -69,9 +71,13 @@ class RegistrationForm(Styled, forms.Form):
 
 
 class LoginForm(Styled, forms.Form):
-    email = forms.EmailField(label="Email", widget=forms.EmailInput(attrs={"autocomplete": "email"}))
+    email = forms.EmailField(
+        label="Email", widget=forms.EmailInput(attrs={"autocomplete": "email"})
+    )
     password = forms.CharField(
-        label="Password", strip=False, widget=forms.PasswordInput(attrs={"autocomplete": "current-password"})
+        label="Password",
+        strip=False,
+        widget=forms.PasswordInput(attrs={"autocomplete": "current-password"}),
     )
 
     def clean_email(self):
@@ -79,7 +85,9 @@ class LoginForm(Styled, forms.Form):
 
 
 class EmailForm(Styled, forms.Form):
-    email = forms.EmailField(label="Email", widget=forms.EmailInput(attrs={"autocomplete": "email"}))
+    email = forms.EmailField(
+        label="Email", widget=forms.EmailInput(attrs={"autocomplete": "email"})
+    )
 
     def clean_email(self):
         return User.objects.normalize_email(self.cleaned_data["email"])

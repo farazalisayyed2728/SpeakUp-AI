@@ -18,6 +18,10 @@ urlpatterns = [
         views.PasswordResetConfirmPage.as_view(),
         name="password-reset-confirm",
     ),
-    path("password/reset/complete/", views.password_reset_complete_view, name="password-reset-complete"),
+    path(
+        "password/reset/complete/",
+        views.password_reset_complete_view,
+        name="password-reset-complete",
+    ),
     path("password/change/", views.password_change_view, name="password-change"),
 ]

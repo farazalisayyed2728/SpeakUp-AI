@@ -24,7 +24,7 @@ class UserManager(BaseUserManager):
     def create_superuser(self, email, password=None, **extra):
         extra.setdefault("is_staff", True)
         extra.setdefault("is_superuser", True)
-        extra.setdefault("email_verified_at", timezone.now()) 
+        extra.setdefault("email_verified_at", timezone.now())
         if not (extra["is_staff"] and extra["is_superuser"]):
             raise ValueError("Superuser must have is_staff=True and is_superuser=True.")
         return self._create(email, password, **extra)
@@ -58,6 +58,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     @property
     def is_email_verified(self) -> bool:
         return self.email_verified_at is not None
+
 
 class AuditEvent(models.Model):
     """Append-only security trail. Never store passwords, tokens or raw emails in metadata."""

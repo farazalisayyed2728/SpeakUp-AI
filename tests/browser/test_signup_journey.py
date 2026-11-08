@@ -14,7 +14,9 @@ pytestmark = pytest.mark.django_db(transaction=True)
 @pytest.fixture
 def page():
     with pw.sync_playwright() as p:
-        browser = p.chromium.launch(args=["--use-gl=angle", "--use-angle=swiftshader", "--enable-unsafe-swiftshader"])
+        browser = p.chromium.launch(
+            args=["--use-gl=angle", "--use-angle=swiftshader", "--enable-unsafe-swiftshader"]
+        )
         ctx = browser.new_context(timezone_id="Asia/Kolkata")
         yield ctx.new_page()
         browser.close()
@@ -30,7 +32,9 @@ def test_register_verify_login_logout(live_server, page):
     page.get_by_role("button", name="Create account").click()
     page.wait_for_url("**/check-email/")
 
-    link = re.search(r"https?://\S+", mail.outbox[-1].body).group(0).replace("http://testserver", base)
+    link = (
+        re.search(r"https?://\S+", mail.outbox[-1].body).group(0).replace("http://testserver", base)
+    )
     # unverified login is refused
     page.goto(f"{base}/accounts/login/")
     page.get_by_label("Email").fill("ada@example.com")

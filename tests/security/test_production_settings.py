@@ -5,7 +5,11 @@ import sys
 import pytest
 
 BASE_ENV = {
-    "PATH": os.environ.get("PATH", ""),
+    **{
+        key: value
+        for key, value in os.environ.items()
+        if not key.startswith("DJANGO_") and key not in {"DATABASE_URL", "SENTRY_DSN"}
+    },
     "DJANGO_SETTINGS_MODULE": "config.settings.production",
     "DATABASE_URL": "postgresql://u:p@localhost:5432/db",
 }
