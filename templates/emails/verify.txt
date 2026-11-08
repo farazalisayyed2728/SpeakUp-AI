@@ -1,0 +1,7 @@
+Hi{% if user.full_name %} {{ user.full_name }}{% endif %},
+
+Confirm your email to finish creating your SpeakUp AI account:
+
+{{ link }}
+
+This link expires in {{ hours }} hours. If you didn't sign up, ignore this email and nothing will happen.
