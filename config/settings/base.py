@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "apps.core",
     "apps.accounts",
+    "apps.profiles",
     # NOTE: the future sessions app must NOT be labelled "sessions" (clashes with
     # django.contrib.sessions). Use apps.practice_sessions.
 ]
