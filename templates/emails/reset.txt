@@ -1,0 +1,7 @@
+Hi{% if user.full_name %} {{ user.full_name }}{% endif %},
+
+Someone asked to reset the password for this SpeakUp AI account. To choose a new one, open:
+
+{{ link }}
+
+This link expires in {{ minutes }} minutes and works once. If it wasn't you, you can ignore this email; your password hasn't changed.
