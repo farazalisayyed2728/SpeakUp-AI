@@ -33,5 +33,17 @@ document.addEventListener("alpine:init", () => {
   }));
 });
 
+// Auth pages: the orb is decoration and gives a small nudge as the person types.
+document.addEventListener("alpine:init", () => {
+  Alpine.data("orbBackdrop", () => ({
+    orb: null,
+    init() {
+      const c = this.$refs.canvas;
+      this.orb = createOrb(c, { onFallback: () => c.classList.add("hidden") });
+    },
+    pulse(a = 0.22) { this.orb?.pulse(a); },
+  }));
+});
+
 Alpine.start();
 initTilt();

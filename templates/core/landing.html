@@ -44,9 +44,9 @@
 
         <div class="mt-8 flex flex-wrap items-center gap-3">
           <a
-            href="#modes"
+            href="{% if user.is_authenticated %}{% url 'core:dashboard' %}{% else %}{% url 'accounts:register' %}{% endif %}"
             class="rounded-full bg-saffron px-6 py-3 font-semibold text-night transition hover:brightness-110"
-            >See the practice modes</a
+            >{% if user.is_authenticated %}Go to your dashboard{% else %}Create a free account{% endif %}</a
           >
           <button
             type="button"
@@ -242,7 +242,7 @@
     <p class="font-display text-lg font-bold text-white">
       SpeakUp<span class="text-signal"> AI</span>
     </p>
-    <p>Early build. Accounts arrive in the next release.</p>
+    <p>Early build. Practice sessions arrive in the next releases.</p>
   </div>
 </footer>
 {% endblock %}

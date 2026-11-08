@@ -145,5 +145,5 @@ export function createOrb(canvas, { onFallback } = {}) {
   new IntersectionObserver(([e]) => (e.isIntersecting ? start() : stop())).observe(canvas);
   document.addEventListener("visibilitychange", () => (document.hidden ? stop() : start()));
 
-  return { enableMic, disableMic, get micOn() { return !!analyser; } };
+  return { pulse(a = 0.22) { level = Math.min(1, level + a); }, enableMic, disableMic, get micOn() { return !!analyser; } };
 }
